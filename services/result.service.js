@@ -1,7 +1,7 @@
 const {Result, User, Lesson} = require('../models');
 
 module.exports = {
-    getAllResultByUserId: async (userId) => {
+    getResultsByUserId: async (userId) => {
         try {
             
             const results = await Result.findAll({

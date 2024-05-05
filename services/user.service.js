@@ -78,9 +78,9 @@ module.exports = {
         }
 
     },
-    getUserById: async (id) => {
+    getUserById: async (userId) => {
         try{
-            const user = await User.findByPk(id, {
+            const user = await User.findByPk(userId, {
                 attributes: [
                     "userId",
                     "fullname",
@@ -121,7 +121,8 @@ module.exports = {
                     "fullname",
                     "avatar",
                 ]
-            })
+            });
+            return users;
         } catch(error) {
             return Promise.reject({
                 message: "Internal Server Error",
