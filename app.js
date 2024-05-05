@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 const userRoutes = require("./routes/user.route");
-
+const lessonRoutes = require("./routes/lesson.route");
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -23,9 +23,9 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-// app.use("/api", router);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/users", userRoutes);
-
+app.use("/api/lesson", lessonRoutes);
 app.get("/", (req, res, next) => {
     res.send("Server is running ...");
 });
