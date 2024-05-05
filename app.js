@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require('cors');
 const app = express();
 const userMiddleware = require("./middleware/user.middleware");
 const path = require('path');
@@ -14,21 +15,22 @@ app.use(bodyParser.json());
 const router = express.Router();
 const userRoutes = require("./routes/user.route");
 
-// Session
-app.use(
-    session({
-        secret: "secret",
-        resave: false,
-        saveUninitialized: false,
-        cookie: { maxAge: 60000 },
-    })
-);
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
-app.use("/api", router);
+app.use(cors());
+// app.use("/api", router);
 app.use("/api/users", userRoutes);
 
 router.get("/", (req, res, next) => {
     res.send("Server is running ...");
 });
-
+const PORT = process.env.PORT || 3007; // Sử dụng cổng được xác định trong biến môi trường hoặc mặc định là 3000
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 module.exports = app;

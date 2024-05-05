@@ -1,4 +1,4 @@
-const {Result, User, Lesson} = require('../models');
+const {Result, User, Lesson} = require('../models/result.model');
 
 module.exports = {
     getResultsByUserId: async (userId) => {

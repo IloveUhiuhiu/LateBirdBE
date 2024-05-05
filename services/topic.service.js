@@ -1,4 +1,4 @@
-const {Topic,Lesson} = require('../models');
+const {Topic,Lesson} = require('../models/topic.model');
 
 module.exports = {
     getAllTopic: async () => {

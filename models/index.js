@@ -98,10 +98,7 @@ db.sequelize = sequelize
         console.log("Database connection established successfully.");
         return sequelize.sync({ force: false });
     })
-    .then(() => {
-        console.log("Models synced successfully.");
-        return initData();
-    })
+    
     .catch((err) => {
         console.error("Unable to connect to the database:", err);
     });
@@ -109,6 +106,3 @@ db.sequelize = sequelize
 db.Sequelize = Sequelize;
 
 module.exports = db;
-
-
-

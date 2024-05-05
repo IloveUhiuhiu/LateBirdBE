@@ -1,4 +1,5 @@
-const {Lesson,Photo} = require("../models");
+const { Lesson } = require("../models/lesson.model");
+const { Photo } = require("../models/photo.model");
 
 module.exports = {
     getAllLesson: async () => {

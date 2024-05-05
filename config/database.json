@@ -1,10 +1,11 @@
 {
   "development": {
     "username": "root",
-    "password": "0987654321qa",
-    "database": "LateBird",
+    "password": "duy432003",
+    "database": "latebird",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "port": 3306
   },
   "test": {
     "username": "root",
