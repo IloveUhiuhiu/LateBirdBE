@@ -59,4 +59,7 @@ module.exports = {
             res.status(error.statusCode || 500).json({ error: error.message });
         }
     },
+    hi: async (req, res) => {
+        res.status(200).json({ message: "Hi" });
+    },
 };

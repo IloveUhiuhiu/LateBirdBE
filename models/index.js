@@ -43,150 +43,67 @@ Object.keys(db).forEach((modelName) => {
         db[modelName].associate(db);
     }
 });
-
-// init Data
-// async function initData() {
-//     // destroy all data
-//     await db.PostSave.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.NotificationComment.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.NotificationPost.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.ReportComment.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.ReportPost.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.CommentVote.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.PostVote.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.VoteType.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.LectureEvent.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Lecture.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Follow.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Comment.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.PostEvent.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Post.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.UserRole.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Post.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Role.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.User.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.EventCategory.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Event.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     await db.Category.destroy({
-//         where: {},
-//         truncate: false,
-//     });
-
-//     // init data
-//     await db.Category.initData();
-//     await db.Event.initData();
-//     await db.EventCategory.initData();
-//     await db.User.initData();
-//     await db.Role.initData();
-//     await db.UserRole.initData();
-//     await db.Post.initData();
-//     await db.PostEvent.initData();
-//     await db.Comment.initData();
-//     await db.Follow.initData();
-//     await db.Lecture.initData();
-//     await db.LectureEvent.initData();
-//     await db.VoteType.initData();
-//     await db.PostVote.initData();
-//     await db.CommentVote.initData();
-//     await db.ReportPost.initData();
-//     await db.ReportComment.initData();
-//     await db.NotificationPost.initData();
-//     await db.NotificationComment.initData();
-//     await db.PostSave.initData();
-// }
-
-//Connect to the database and then call initData
-
 db.sequelize = sequelize
     .authenticate()
     .then(() => {
-        console.log('Database connection established successfully.');
-        return sequelize.sync({ force: false});
+        console.log("Database connection established successfully.");
+        return sequelize.sync({ force: false });
     })
+    // .then(() => {
+    //     console.log("Models synced successfully.");
+    //     return initData();
+    // })
     .catch((err) => {
-        console.error('Unable to connect to the database:', err);
+        console.error("Unable to connect to the database:", err);
     });
 
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+
+//Connect to the database and then call initData
+
+// async function checkAndCreateDatabase() {
+//     try {
+//         // Kết nối với máy chủ MySQL (không chỉ định cơ sở dữ liệu cụ thể)
+//         const adminSequelize = new Sequelize({
+//             host: config.host,
+//             username: config.username,
+//             password: config.password,
+//             dialect: config.dialect,
+//             port: config.port
+//         });
+
+//         // Kiểm tra cơ sở dữ liệu có tồn tại không
+//         await adminSequelize.query(`CREATE DATABASE IF NOT EXISTS ${ config.database }`);
+
+//         // Đóng kết nối admin
+//         await adminSequelize.close();
+
+//         //console.log(Database '${config.database}' checked and created if it didn't exist.);
+//     } catch (err) {
+//         console.error('Error checking/creating database:', err);
+//         throw err;
+//     }
+// }
+
+// Kiểm tra và tạo cơ sở dữ liệu nếu cần trước khi xác thực kết nối
+// checkAndCreateDatabase()
+//     .then(() => {
+//         // Xác thực kết nối
+//         return sequelize.authenticate();
+//     })
+//     .then(() => {
+//         console.log("Database connection established successfully.");
+//         // Đồng bộ hóa mô hình
+//         return sequelize.sync({ force: true });
+//     })
+//     .catch((err) => {
+//         console.error("Unable to connect to the database:", err);
+//     });
+
+// module.exports = {
+//     sequelize,
+//     Sequelize,
+// };

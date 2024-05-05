@@ -1,5 +1,6 @@
-const {User} = require('../models');
+const { User } = require('../models');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = {
     login: async (data) => {
@@ -7,13 +8,20 @@ module.exports = {
             const user = await User.findOne({
                 where: {
                     username: data.username,
-                    hashedPassword: data.hashedPassword,
                 }
             });
 
             if (!user) {
                 return Promise.reject({
-                    message: "Auth failed",
+                    message: "user not found",
+                    statusCode: 401,
+                });
+            }
+
+            const isPasswordValid = await bcrypt.compare(data.password, user.hashedPassword);
+            if (!isPasswordValid) {
+                return Promise.reject({
+                    message: "Password is incorrect",
                     statusCode: 401,
                 });
             }
@@ -26,38 +34,50 @@ module.exports = {
                     createdAt: user.createdAt,
                     birthday: user.birthday,
                     avatar: user.avatar,
-
                 },
                 "secret",
                 {
                     expiresIn: "24h",
                 }
             );
-            console.log(token);
+
             const result = {
                 message: "Auth successful",
                 token: token,
             };
-            
+
             return result;
-            
         } catch (error) {
             console.log(error);
             return Promise.reject({
-                message: "Internal Server Error",
+                error: error.message,
                 statusCode: 500,
             });
         }
     },
     register: async (data) => {
         try {
+            // Kiểm tra xem username đã tồn tại trong cơ sở dữ liệu hay chưa
+            const existingUser = await User.findOne({
+                where: {
+                    username: data.username
+                }
+            });
+            if (existingUser) {
+                return Promise.reject({
+                    message: "Username already exists",
+                    statusCode: 400,
+                });
+            }
+            const hashedPassword = await bcrypt.hash(data.password, 10);
             const user = await User.create({
                 username: data.username,
-                hashedPassword: data.hashedPassword,
+                hashedPassword: hashedPassword,
                 fullname: data.fullname,
                 birthday: data.birthday,
                 avatar: data.avatar,
             });
+
             const result = {
                 message: "User created",
                 user: {
@@ -72,12 +92,13 @@ module.exports = {
             return result;
         } catch (error) {
             return Promise.reject({
-                message: "Internal Server Error",
+                message: error.message,
                 statusCode: 500,
             });
         }
+    }
 
-    },
+,
     getUserById: async (userId) => {
         try{
             const user = await User.findByPk(userId, {
@@ -108,7 +129,7 @@ module.exports = {
         } catch (error)
         {
             return Promise.reject({
-                message: "Internal Server Error",
+                message: error.message,
                 statusCode: 500,
             });
         }
@@ -125,7 +146,7 @@ module.exports = {
             return users;
         } catch(error) {
             return Promise.reject({
-                message: "Internal Server Error",
+                message: error.message,
                 statusCode: 500,
             });
         }
