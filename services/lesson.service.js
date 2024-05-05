@@ -4,7 +4,13 @@ module.exports = {
     getAllLesson: async () => {
         try {
             // Lấy tất cả các Lesson
-            const lessons = await Lesson.findAll();
+            const lessons = await Lesson.findAll({
+                include: [{
+                    model: Photo,
+                    as: 'photos',
+                    attributes: ['photoId', 'linkPhoto'] // Chỉ lấy các thuộc tính cần thiết
+                }]
+            });
 
             // Trả về danh sách các Lesson
             return lessons;
@@ -16,7 +22,14 @@ module.exports = {
     getLessonById: async (lessonId) => {
         try {
             // Tìm Lesson theo lessonId
-            const lesson = await Lesson.findByPk(lessonId);
+            const lesson = await Lesson.findByPk(lessonId, {
+                include: [{
+                    model: Photo,
+                    as: 'photos',
+                    attributes: ['photoId', 'linkPhoto']
+                }]
+            });
+
 
             // Kiểm tra xem Lesson có tồn tại không
             if (!lesson) {

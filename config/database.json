@@ -1,20 +1,23 @@
-
-    {
-      "dbName": "LateBird",  
-
-      "dbConfig": {
-          "server": "DESKTOP-1JCOVFJ\\SQLEXPRESS",  
-          "authentication": {
-          "type": "default",  
-          "options": {
-            "userName": "sa",  
-            "password": "123"  
-          }
-          },
-          "options": {
-            
-            "encrypt": true,  
-            "trustServerCertificate": true  
-          }
-      }
-    }
+{
+  "development": {
+    "username": "root",
+    "password": "0987654321qa",
+    "database": "LateBird",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

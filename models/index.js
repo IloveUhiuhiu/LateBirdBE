@@ -1,64 +1,192 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
-const tedious = require('tedious');
-const { Sequelize, DataTypes } = require('sequelize');
-
-const { dbName, dbConfig } = require(__dirname + '/../config/database.json');
-
+const Sequelize = require('sequelize');
+const process = require('process');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/database.json')[env];
 const db = {};
 
-initialize();
-
-async function initialize() {
-    const dialect = 'mssql';
-    const host = dbConfig.server;
-    const { userName, password } = dbConfig.authentication.options;
-
-    // create db if it doesn't already exist
-    await ensureDbExists(dbName);
-
-    // connect to db
-    const sequelize = new Sequelize(dbName, userName, password, { host, dialect });
-
-    // init models and add them to the exported db object
-    db.User = require('./user.model.js')(sequelize,DataTypes);
-    db.Photo = require('./photo.model.js')(sequelize,DataTypes);
-    db.Lesson = require('./lesson.model.js')(sequelize,DataTypes);
-    db.Topic = require('./topic.model.js')(sequelize,DataTypes);
-    db.Result = require('./result.model.js')(sequelize,DataTypes);
-    db.User.associate(db);
-    db.Photo.associate(db);
-    db.Lesson.associate(db);
-    db.Topic.associate(db);
-    db.Result.associate(db);
-    // sync all models with database
-    await sequelize.sync({ force: false });
+let sequelize;
+if (config.use_env_variable) {
+    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+    sequelize = new Sequelize(
+        config.database,
+        config.username,
+        config.password,
+        config
+    );
 }
 
-async function ensureDbExists(dbName) {
-    return new Promise((resolve, reject) => {
-        const connection = new tedious.Connection(dbConfig);
-        connection.connect((err) => {
-            if (err) {
-                console.error(err);
-                reject(`Connection Failed: ${err.message}`);
-            }
-
-            const createDbQuery = `IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = '${dbName}') CREATE DATABASE [${dbName}];`;
-            const request = new tedious.Request(createDbQuery, (err) => {
-                if (err) {
-                    console.error(err);
-                    reject(`Create DB Query Failed: ${err.message}`);
-                }
-
-                // query executed successfully
-                resolve();
-            });
-
-            connection.execSql(request);
-        });
+fs.readdirSync(__dirname)
+    .filter((file) => {
+        return (
+            file.indexOf('.') !== 0 &&
+            file !== basename &&
+            file.slice(-3) === '.js' &&
+            file.indexOf('.test.js') === -1
+        );
+    })
+    .forEach((file) => {
+        const model = require(path.join(__dirname, file))(
+            sequelize,
+            Sequelize.DataTypes
+        );
+        db[model.name] = model;
     });
-}
+
+Object.keys(db).forEach((modelName) => {
+    if (db[modelName].associate) {
+        db[modelName].associate(db);
+    }
+});
+
+// init Data
+// async function initData() {
+//     // destroy all data
+//     await db.PostSave.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.NotificationComment.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.NotificationPost.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.ReportComment.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.ReportPost.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.CommentVote.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.PostVote.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.VoteType.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.LectureEvent.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Lecture.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Follow.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Comment.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.PostEvent.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Post.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.UserRole.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Post.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Role.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.User.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.EventCategory.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Event.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     await db.Category.destroy({
+//         where: {},
+//         truncate: false,
+//     });
+
+//     // init data
+//     await db.Category.initData();
+//     await db.Event.initData();
+//     await db.EventCategory.initData();
+//     await db.User.initData();
+//     await db.Role.initData();
+//     await db.UserRole.initData();
+//     await db.Post.initData();
+//     await db.PostEvent.initData();
+//     await db.Comment.initData();
+//     await db.Follow.initData();
+//     await db.Lecture.initData();
+//     await db.LectureEvent.initData();
+//     await db.VoteType.initData();
+//     await db.PostVote.initData();
+//     await db.CommentVote.initData();
+//     await db.ReportPost.initData();
+//     await db.ReportComment.initData();
+//     await db.NotificationPost.initData();
+//     await db.NotificationComment.initData();
+//     await db.PostSave.initData();
+// }
+
+//Connect to the database and then call initData
+
+db.sequelize = sequelize
+    .authenticate()
+    .then(() => {
+        console.log('Database connection established successfully.');
+        return sequelize.sync({ force: false});
+    })
+    .catch((err) => {
+        console.error('Unable to connect to the database:', err);
+    });
+
+db.Sequelize = Sequelize;
 
 module.exports = db;

@@ -20,7 +20,7 @@ module.exports = {
 
             const token = jwt.sign(
                 {
-                    id: user.id,
+                    userId: user.userId,
                     username: user.username,
                     fullname: user.fullname,
                     createdAt: user.createdAt,
@@ -61,7 +61,7 @@ module.exports = {
             const result = {
                 message: "User created",
                 user: {
-                    id: user.id,
+                    userId: user.userId,
                     username: user.username,
                     fullname: user.fullname,
                     birthday: user.birthday,
@@ -82,7 +82,7 @@ module.exports = {
         try{
             const user = await User.findByPk(id, {
                 attributes: [
-                    "id",
+                    "userId",
                     "fullname",
                     "createdAt",
                     "birthday",
@@ -97,7 +97,7 @@ module.exports = {
                 });
             }
             const result = {
-                id: user.id,
+                userId: user.userId,
                 fullname: user.fullname,
                 createdAt: user.createdAt,
                 birthday: user.birthday,
@@ -117,7 +117,7 @@ module.exports = {
         try {
             const users = await User.findAll({
                 attributes: [
-                    "id",
+                    "userId",
                     "fullname",
                     "avatar",
                 ]

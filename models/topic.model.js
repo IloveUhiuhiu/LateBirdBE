@@ -14,7 +14,7 @@ module.exports = (sequelize,DataTypes) => {
       }
     }
     Topic.init({
-        id:{
+        topicId:{
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
