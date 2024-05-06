@@ -1,4 +1,5 @@
-const {Photo, Lesson} = require("../models/photo.model");
+const {Photo} = require("../models/photo.model");
+const {Lesson} = require("../models/lesson.model");
 
 module.exports = {
     getPhotoByLessonId: async (lessonId) => {

@@ -1,38 +1,69 @@
-const {Topic,Lesson} = require('../models/topic.model');
+
+const { Lesson,Topic } = require('../models');
+
 
 module.exports = {
     getAllTopic: async () => {
         try {
-            const topics = await Topic.FindAll(); 
+            const topics = await Topic.findAll(); 
             return topics;
         } catch (error) {
             throw new Error(`Error fetching all topic: ${error.message}`);
         }
         
     },
-    getTopicById: async (topicId) => {
+    getTopicById: async (data) => {
         try {
-            const topic = await Topic.FindByPk(topicId, {
-                include: [ {
-                    model: Lesson,
-                    as: 'lessons',
-                    attributes: ['lessonId','word']
-                }]
-            });
+            const topic = await Topic.findByPk(data.topicId);
             return topic;
         } catch (error) {
             throw new Error(`Error fetching topic by id: ${error.message}`);
         }
     },
-    createTopic: (nameTopic) => {
+    createTopic: async (data) => {
         try {
-            const topic = Topic.create({
-                nameTopic: nameTopic,
+            const existingTopic = await Topic.findOne({
+                where: {
+                    nameTopic: data.nameTopic
+                }
             });
-            return topic;
+            if (existingTopic) {
+                return Promise.reject({
+                    message: "nameTopic already exists",
+                    statusCode: 400,
+                });
+            }
+            const topic = Topic.create({
+                nameTopic: data.nameTopic,
+            });
+            const result = {
+                message: "Topic created",
+                topic: {
+                    topicId: topic.topicId,
+                    nameTopic: topic.nameTopic,
+                },
+            };
+            
+            return result;
         } catch (error) {
             throw new Error(`Error creating topic: ${error.message}`);
         }   
         
+    },
+    updateTopic: async (data) => {
+        try {
+            const topic = await Topic.findByPk(data.topicId);
+            if (!topic) {
+                throw new Error(`Topic with ID ${data.topicId} not found`);
+            }
+
+            // Update các thuộc tính của topic với data
+            await topic.update(data);
+
+            const updatedTopic = await Topic.findByPk(data.topicId);
+            return updatedTopic;
+        } catch (error) {
+            throw new Error(`Error updating topic: ${error.message}`);
+        }
     }
 }
