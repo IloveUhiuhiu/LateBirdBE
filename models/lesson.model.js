@@ -1,20 +1,20 @@
 'use strict';
 
-const {Model} = require('sequelize');
+const { Model } = require('sequelize');
 
-module.exports = (sequelize,DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
     class Lesson extends Model {
-        /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-        // define association here
-        Lesson.belongsTo(models.Topic, {
-            foreignKey: 'topicId'
-        });
-      }
+        static associate(models) {
+            Lesson.belongsTo(models.Topic, {
+                foreignKey: 'topicId'
+            });
+
+            // Thiết lập mối quan hệ hasMany với mô hình Photo
+            Lesson.hasMany(models.Photo, {
+                foreignKey: 'lessonId',
+                as: 'photos' // Đặt tên cho mối quan hệ để sử dụng trong các truy vấn
+            });
+        }
     }
 
     Lesson.init({
@@ -27,12 +27,13 @@ module.exports = (sequelize,DataTypes) => {
             type: DataTypes.STRING(128)
         },
         linkVideo: {
-            type:DataTypes.STRING(128)
+            type: DataTypes.STRING(128)
         }
     }, {
         sequelize,
         modelName: 'Lesson',
         timestamps: false,
-    })
+    });
+
     return Lesson;
-}
+};
