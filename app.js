@@ -15,6 +15,9 @@ app.use(bodyParser.json());
 const router = express.Router();
 const userRoutes = require("./routes/user.route");
 const lessonRoutes = require("./routes/lesson.route");
+const topicRoutes = require("./routes/topic.route");
+const resultRoutes = require("./routes/result.route");
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -26,10 +29,13 @@ app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/users", userRoutes);
 app.use("/api/lesson", lessonRoutes);
-app.get("/", (req, res, next) => {
+app.use("/api/topics",topicRoutes);
+app.use("/api/results",resultRoutes);
+
+router.get("/", (req, res, next) => {
     res.send("Server is running ...");
 });
-const PORT = process.env.PORT || 3007; // Sử dụng cổng được xác định trong biến môi trường hoặc mặc định là 3000
+const PORT = process.env.PORT || 3007; 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

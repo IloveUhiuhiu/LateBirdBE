@@ -1,47 +1,67 @@
-const {Result, User, Lesson} = require('../models/result.model');
+const {Result, Lesson, User} = require('../models');
+
 
 module.exports = {
-    getResultsByUserId: async (userId) => {
+    getResultsByUserId: async (data) => {
         try {
             
             const results = await Result.findAll({
                 where: {
-                    userId: userId
+                    userId: data.userId
                 },
-                include: {
-                    model: Lesson,
-                    as: 'lesson', 
-                    attributes: ['lessonId', 'word', 'linkVideo'] 
-                },
-                attributes: ['content'], 
             });
-
-            
-            const lessonsWithContent = results.map(result => ({
-                lesson: result.lesson, 
-                content: result.content 
-            }));
-
-           
-            return lessonsWithContent;
+            return results;
         } catch (error) {
-            throw new Error(`Error fetching lessons by user ID ${userId}: ${error.message}`);
+            throw new Error(`Error fetching lessons by user ID ${data.userId}: ${error.message}`);
         }
     },
-    createResult: async (userId,lessonId, content) => {
+    createResult: async (data) => {
         try {
-            const result = Result.create({
-                userId: userId,
-                lessonId: lessonId,
-                content: content
+            const existingResult = await Result.findOne({
+                where: {
+                    userId: data.userId,
+                    lessonId: data.lessonId
+                }
             });
+            if (existingResult) {
+                return Promise.reject({
+                    message: "Result already exists",
+                    statusCode: 400,
+                });
+            }
+            const result = Result.create({
+                userId: data.userId,
+                lessonId: data.lessonId,
+                content: data.content
+            });
+            // Kiểm tra result có được tạo thành công không
+            if (!result) {
+                throw new Error("Failed to create result");
+            }
+            
+            
+            return result;
+        }catch (error) {
+            throw new Error(`Error creating result: ${error.message}`);
+        }
+    },
+    updateResult: async (data) => {
+        try {
+            const result = await Result.findByPk(data.resultId);
+            if (!result) {
+                throw new Error(`result with ID ${data.resultId} not found`);
+            }
+
+            // Update các thuộc tính của result với data
+            await result.update(data);
+            
             // Kiểm tra result có được tạo thành công không
             if (!result) {
                 throw new Error("Failed to create result");
             }
             return result;
         }catch (error) {
-            throw new Error(`Error creating result: ${error.message}`);
+            throw new Error(`Error updating result: ${error.message}`);
         }
     }
 }

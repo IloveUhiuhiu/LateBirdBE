@@ -43,23 +43,7 @@ Object.keys(db).forEach((modelName) => {
         db[modelName].associate(db);
     }
 });
-db.sequelize = sequelize
-    .authenticate()
-    .then(() => {
-        console.log("Database connection established successfully.");
-        return sequelize.sync({ force: false });
-    })
-    // .then(() => {
-    //     console.log("Models synced successfully.");
-    //     return initData();
-    // })
-    .catch((err) => {
-        console.error("Unable to connect to the database:", err);
-    });
 
-db.Sequelize = Sequelize;
-
-module.exports = db;
 
 
 //Connect to the database and then call initData
@@ -76,19 +60,19 @@ module.exports = db;
 //         });
 
 //         // Kiểm tra cơ sở dữ liệu có tồn tại không
-//         await adminSequelize.query(`CREATE DATABASE IF NOT EXISTS ${ config.database }`);
-
+//         await adminSequelize.query(`CREATE DATABASE IF NOT EXISTS ${config.database}`);
+        
 //         // Đóng kết nối admin
 //         await adminSequelize.close();
-
-//         //console.log(Database '${config.database}' checked and created if it didn't exist.);
+        
+//         console.log(`Database '${config.database}' checked and created if it didn't exist.`);
 //     } catch (err) {
 //         console.error('Error checking/creating database:', err);
 //         throw err;
 //     }
 // }
 
-// Kiểm tra và tạo cơ sở dữ liệu nếu cần trước khi xác thực kết nối
+// // Kiểm tra và tạo cơ sở dữ liệu nếu cần trước khi xác thực kết nối
 // checkAndCreateDatabase()
 //     .then(() => {
 //         // Xác thực kết nối
@@ -107,3 +91,18 @@ module.exports = db;
 //     sequelize,
 //     Sequelize,
 // };
+
+db.sequelize = sequelize
+    .authenticate()
+    .then(() => {
+        console.log("Database connection established successfully.");
+        return sequelize.sync({ force: false });
+    })
+    
+    .catch((err) => {
+        console.error("Unable to connect to the database:", err);
+    });
+
+db.Sequelize = Sequelize;
+
+module.exports = db;

@@ -49,13 +49,16 @@ module.exports = {
     },
     getInformation: async (req, res) => {
         try {
+            console.log("userId:", req.body);
+            console.log('Authorization header:', req.headers.authorization);
             const result = await userService.getUserById(
+                
                 jwtService.decodeToken(req.headers.authorization.substring(7))
                     .userId
             );
             res.status(200).json(result);
         } catch (error) {
-            res.status(error.statusCode || 500).json({ error: error.message });
+            res.status(error.statusCode || 500).json({ error: error.message});
         }
     },
     hi: async (req, res) => {
