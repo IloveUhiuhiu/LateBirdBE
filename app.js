@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 const userRoutes = require("./routes/user.route");
+const lessonRoutes = require("./routes/lesson.route");
 const topicRoutes = require("./routes/topic.route");
 const resultRoutes = require("./routes/result.route");
 
@@ -25,8 +26,9 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-// app.use("/api", router);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/users", userRoutes);
+app.use("/api/lesson", lessonRoutes);
 app.use("/api/topics",topicRoutes);
 app.use("/api/results",resultRoutes);
 
