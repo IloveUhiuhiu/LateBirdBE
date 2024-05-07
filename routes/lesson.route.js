@@ -9,6 +9,6 @@ router.get('/get/:lessonId', lessonController.getLessonById);
 router.get('/getAll', lessonController.getAllLessons);
 router.get('/getAllByTopicId/:topicId', lessonController.getAllLessonByTopicId);
 router.delete('/delete/:lessonId', lessonController.deleteLesson);
-router.put('/update/:lessonId', lessonController.updateLesson);
+router.put('/update/:lessonId', upload.array('img', 5), lessonController.updateLesson);
 
 module.exports = router;
