@@ -61,9 +61,5 @@ module.exports = {
         }   
         
     },
-    hi: async (req,res) => {
-        res.status(200).json({
-            message: "hi"
-        });
-    }
+    
 }
