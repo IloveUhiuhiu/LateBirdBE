@@ -46,7 +46,9 @@ module.exports = {
     updateLesson: async (req, res) => {
         try {
             const lessonId = req.params.lessonId;
-            const result = await lessonService.updateLesson(lessonId, req);
+            const newLesson = req.body;
+            const files = req.files;
+            const result = await lessonService.updateLesson(lessonId, newLesson, files);
             res.status(200).json(result);
         } catch (error) {
             res.status(error.statusCode || 500).json({ error: error.message });

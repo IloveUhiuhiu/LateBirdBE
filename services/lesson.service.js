@@ -95,9 +95,8 @@ module.exports = {
             }
     },
     //update lesson
-    updateLesson: async (lessonId,req) => {
-        const { word, linkVideo, topicId } = req.body;
-        const images = req.files;
+    updateLesson: async (lessonId, newLesson, images) => {
+        const { word, linkVideo, topicId } = newLesson;
 
         // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
         const imgPaths = [];
@@ -125,10 +124,9 @@ module.exports = {
 
             await Promise.all(photoPromises);
 
-            res.status(200).json({ message: 'Lesson updated successfully.' });
+            return { message: 'Lesson updated successfully.' };
         } catch (error) {
-            console.error('Error updating lesson:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            throw new Error({ error: 'Internal server error' }, STATUS_CODES.INTERNAL_SERVER_ERROR);
         }
     },
     //delete lesson
