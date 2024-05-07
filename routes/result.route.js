@@ -3,7 +3,7 @@ const router = express.Router();
 const resultController = require("../controllers/result.controller");
 
 
-router.get("/information", resultController.getResultsByUserId);
+router.get("/information/:userId", resultController.getResultsByUserId);
 router.post("/create", resultController.createResult);
-router.put("/update", resultController.updateResult);
+router.put("/update/:resultId", resultController.updateResult);
 module.exports = router;

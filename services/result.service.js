@@ -2,12 +2,12 @@ const {Result, Lesson, User} = require('../models');
 
 
 module.exports = {
-    getResultsByUserId: async (data) => {
+    getResultsByUserId: async (userId,data) => {
         try {
             
             const results = await Result.findAll({
                 where: {
-                    userId: data.userId
+                    userId: userId
                 },
             });
             return results;
@@ -45,11 +45,11 @@ module.exports = {
             throw new Error(`Error creating result: ${error.message}`);
         }
     },
-    updateResult: async (data) => {
+    updateResult: async (resultId,data) => {
         try {
-            const result = await Result.findByPk(data.resultId);
+            const result = await Result.findByPk(resultId);
             if (!result) {
-                throw new Error(`result with ID ${data.resultId} not found`);
+                throw new Error(`result with ID ${resultId} not found`);
             }
 
             // Update các thuộc tính của result với data

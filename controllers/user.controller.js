@@ -17,20 +17,6 @@ module.exports = {
             res.status(error.statusCode || 500).json({ error: error.message });
         }
     },
-    getResultsByUserId: async (req, res) => {
-        try {
-            let userId = req.params.userId;
-            if (!userId) {
-                userId = jwtService.decodeToken(
-                    req.headers.authorization.substring(7)
-                ).userId;
-            }
-            const results = await resultService.getResultsByUserId(userId);
-            res.status(200).json(results);
-        } catch (error) {
-            res.status(error.statusCode || 500).json({ error: error.message });
-        }
-    },
     register: async (req, res) => {
         try {
             const result = await userService.register(req.body);
@@ -49,7 +35,7 @@ module.exports = {
     },
     getInformation: async (req, res) => {
         try {
-            console.log("userId:", req.body);
+            // console.log("userId:", req.body);
             console.log('Authorization header:', req.headers.authorization);
             const result = await userService.getUserById(
                 
@@ -58,10 +44,8 @@ module.exports = {
             );
             res.status(200).json(result);
         } catch (error) {
-            res.status(error.statusCode || 500).json({ error: error.message});
+            res.status(error.statusCode || 500).json({ error : error.message});
         }
     },
-    hi: async (req, res) => {
-        res.status(200).json({ message: "Hi" });
-    },
+  
 };

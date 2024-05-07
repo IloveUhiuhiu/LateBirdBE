@@ -96,8 +96,10 @@ module.exports = {
     },
     //update lesson
     updateLesson: async (lessonId,req) => {
+        
         const { word, linkVideo, topicId } = req.body;
-        const images = req.files;
+        const images = req.body;
+        
 
         // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
         const imgPaths = [];

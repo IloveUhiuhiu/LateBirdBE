@@ -30,7 +30,7 @@ module.exports = (sequelize,DataTypes) => {
         fullname: {
             type: DataTypes.STRING(64)
         },
-        createAt: {
+        createdAt: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW
         },

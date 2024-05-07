@@ -12,9 +12,9 @@ module.exports = {
         }
         
     },
-    getTopicById: async (data) => {
+    getTopicById: async (topicId) => {
         try {
-            const topic = await Topic.findByPk(data.topicId);
+            const topic = await Topic.findByPk(topicId);
             return topic;
         } catch (error) {
             throw new Error(`Error fetching topic by id: ${error.message}`);
@@ -50,17 +50,17 @@ module.exports = {
         }   
         
     },
-    updateTopic: async (data) => {
+    updateTopic: async (topicId,data) => {
         try {
-            const topic = await Topic.findByPk(data.topicId);
+            const topic = await Topic.findByPk(topicId);
             if (!topic) {
-                throw new Error(`Topic with ID ${data.topicId} not found`);
+                throw new Error(`Topic with ID ${topicId} not found`);
             }
 
             // Update các thuộc tính của topic với data
             await topic.update(data);
 
-            const updatedTopic = await Topic.findByPk(data.topicId);
+            const updatedTopic = await Topic.findByPk(topicId);
             return updatedTopic;
         } catch (error) {
             throw new Error(`Error updating topic: ${error.message}`);

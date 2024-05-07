@@ -129,7 +129,7 @@ module.exports = {
         } catch (error)
         {
             return Promise.reject({
-                message: error.message,
+                message: error.message + 'kaka',
                 statusCode: 500,
             });
         }

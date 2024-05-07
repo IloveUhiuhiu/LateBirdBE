@@ -20,7 +20,8 @@ module.exports = {
     },
     getTopicById: async (req,res) => {
         try {
-            const result = await topicService.getTopicById(req.body);
+            let topicId = req.params.topicId;
+            const result = await topicService.getTopicById(topicId);
             if (result.error) {
                 res.status(result.statusCode || 500).json({
                     error: result.message
@@ -53,7 +54,8 @@ module.exports = {
     },
     updateTopic: async (req, res) => {
         try {
-            const result = await topicService.updateTopic(req.body);
+            let topicId = req.params.topicId;
+            const result = await topicService.updateTopic(topicId,req.body);
             if (result.error) {
                 res.status(res.statusCode || 500).json({
                     error: result.message

@@ -3,7 +3,9 @@ const resultService = require('../services/result.service');
 module.exports = {
     getResultsByUserId: async (req,res) => {
         try {
-            const results = await resultService.getResultsByUserId(req.body); 
+            let userId = req.params.userId;
+
+            const results = await resultService.getResultsByUserId(userId, req.body); 
             if (results.error) {
                 res.status(results.statusCode || 500).json({
                     error: results.message
@@ -41,9 +43,10 @@ module.exports = {
     },
     updateResult: async (req, res) => {
         try {
+            let resultId = req.params.resultId;
             const contentString = JSON.stringify(req.body.content);
             
-            const result = await resultService.updateResult({
+            const result = await resultService.updateResult(resultId,{
                 ...req.body,
                 content: contentString // Gán chuỗi JSON vào trường content
             });

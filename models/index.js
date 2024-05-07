@@ -96,7 +96,7 @@ db.sequelize = sequelize
     .authenticate()
     .then(() => {
         console.log("Database connection established successfully.");
-        return sequelize.sync({ force: false });
+        return sequelize.sync({ force: true });
     })
     
     .catch((err) => {
