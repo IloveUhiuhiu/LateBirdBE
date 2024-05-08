@@ -1,4 +1,5 @@
 
+const { loadEnvFile } = require('process');
 const { Lesson,Topic } = require('../models');
 
 
@@ -25,6 +26,7 @@ module.exports = {
             const existingTopic = await Topic.findOne({
                 where: {
                     nameTopic: data.nameTopic
+                    
                 }
             });
             if (existingTopic) {
@@ -35,12 +37,14 @@ module.exports = {
             }
             const topic = Topic.create({
                 nameTopic: data.nameTopic,
+                linkPhoto: data.linkPhoto
             });
             const result = {
                 message: "Topic created",
                 topic: {
                     topicId: topic.topicId,
                     nameTopic: topic.nameTopic,
+                    linkPhoto: topic.linkPhoto
                 },
             };
             

@@ -64,5 +64,76 @@ module.exports = {
         }   
         
     },
+    countLessonofTopic: async (req,res) => {
+        try {
+            let topicId = req.params.topicId;
+            const result = await resultService.countLessonofTopic(topicId);
+            if (result.error) {
+                res.status(res.statusCode || 500).json({
+                    error: result.message
+                });
+            } else {
+                res.status(200).json(result);
+            }
+        } catch (error) {
+            res.status(error.statusCode ||500).json({
+                error: error.message 
+            });
+        }
+    },
+    countUserByLesson: async (req,res) => {
+        try {
+            let lessonId = req.params.lessonId;
+            const result = await resultService.countUserByLesson(lessonId);
+            if (result.error) {
+                res.status(res.statusCode || 500).json({
+                    error: result.message
+                });
+            } else {
+                res.status(200).json(result);
+            }
+
+        } catch (error) {
+            res.status(error.statusCode ||500).json({
+                error: error.message 
+            });
+        }
+    },
+    getStatisticLesson: async(req,res) => {
+        try {
+            let userId = req.params.userId;
+            let lessonId = req.params.lessonId;
+            const result = await resultService.getStatisticLesson(lessonId,userId);
+            if (result.error) {
+                res.status(res.statusCode || 500).json({
+                    error: result.message
+                });
+            } else {
+                res.status(200).json(result);
+            }
+
+        } catch (error) {
+            res.status(error.statusCode ||500).json({
+                error: error.message 
+            });
+        }
+    },
+    getStatistic: async (req,res) => {
+        try {
+            let userId = req.params.userId;
+            const result = await resultService.getStatistic(userId);
+            if (result.error) {
+                res.status(res.statusCode || 500).json({
+                    error: result.message
+                });
+            } else {
+                res.status(200).json(result);
+            }
+        } catch (error) {
+            res.status(error.statusCode ||500).json({
+                error: error.message 
+            });
+        }
+    }  
     
 }

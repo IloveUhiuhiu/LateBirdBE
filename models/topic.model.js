@@ -21,6 +21,9 @@ module.exports = (sequelize,DataTypes) => {
         },
         nameTopic: {
             type: DataTypes.STRING(128)
+        },
+        linkPhoto: {
+            type: DataTypes.STRING(128)
         }
     }, {
         sequelize,
