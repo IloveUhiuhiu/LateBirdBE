@@ -37,7 +37,11 @@ module.exports = {
                 throw new Error(`Lessons not found`);
             }
             // Trả về danh sách các Lesson
-            return lessons;
+            
+            return {
+                count: lessons.length,
+                lessons: lessons
+            };
         } catch (error) {
             throw new Error(`Error fetching lessons by topic ID: ${error.message}`);
         }

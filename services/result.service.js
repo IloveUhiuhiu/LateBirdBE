@@ -2,56 +2,7 @@
 const {Result,Lesson} = require('../models');
 
 
-async function getStatisticLesson(lessonId, userId) {
-    try {
-        const completedPractise= await Result.findAll({
-            where: {
-                lessonId :lessonId,
-                userId :userId
-            }
-        });
-        const completedPractiseCount = completedPractise.length;
-        if (completedPractiseCount === 0) {
-            const results = {
-                count: completedPractiseCount,
-                content: ""
-            }
-            return results;
-        }
 
-        
-        
-        const maxContent = JSON.parse(completedPractise[0].content);
-
-        for (const result of completedPractise) {
-            const jsonContent = JSON.parse(result.content);
-            if (maxContent.accuracyScore < jsonContent.accuracyScore) {
-                maxContent = jsonContent;
-            } else if  (maxContent.accuracyScore ===  jsonContent.accuracyScore) {
-                if (maxContent.pronunciationScore < jsonContent.pronunciationScore) {
-                    maxContent = jsonContent;
-                } else if (maxContent.pronunciationScore === jsonContent.pronunciationScore) {
-                    if (maxContent.completenessScore < jsonContent.completenessScore) {
-                        maxContent = jsonContent;
-                    } else if (maxContent.completenessScore == jsonContent.completenessScore) {
-                        if (maxContent.fluencyScore < jsonContent.fluencyScore) {
-                            maxContent = jsonContent;
-                        }
-                    }
-                }
-            
-            }
-        }
-
-        return {
-            count : completedPractiseCount,
-            content: maxContent
-        }
-    } catch (error) {
-        throw new Error (`Error getting Statistic By Lesson and User: ${error.message}`)
-    }
-
-}
 
 module.exports = {
     getResultsByUserId: async (userId,data) => {
@@ -104,21 +55,7 @@ module.exports = {
             throw new Error(`Error updating result: ${error.message}`);
         }
     },
-    countLessonofTopic: async(topicId) => {
-        try {
-        const lessons = await Lesson.findAll({
-            where : {
-                topicId: topicId
-            }
-            
-        });
-        return {
-            "countLesson": lessons.length
-        }
-        } catch (error) {
-            throw new Error(`Error count lesson of topic: ${error.message}`)
-        }
-    },
+    
     countUserByLesson: async(lessonId) => {
         try {
             const completedLessons= await Result.findAll({
@@ -169,7 +106,7 @@ module.exports = {
                     userId :userId
                 }
             });
-            const maxContent = JSON.parse(completedPractise[0].content);
+            let maxContent = JSON.parse(completedPractise[0].content);
 
             for (const result of completedPractise) {
                 const jsonContent = JSON.parse(result.content);
@@ -223,16 +160,65 @@ module.exports = {
       
         const process = arrayLessonIds.length * 100 / lessons.length;
         return {
-            "passedLessons": passedLessons.length,
-            "maxAccuracyofPass": maxAccuracyofPass,
-            "failedLessons": failedLessons.length,
-            "maxAccuracyofFail": maxAccuracyofFail,
-            "completedTopics": completedTopics.size,
-            "process": process
+            passedLessons: passedLessons.length,
+            maxAccuracyofPass: maxAccuracyofPass,
+            failedLessons: failedLessons.length,
+            maxAccuracyofFail: maxAccuracyofFail,
+            completedTopics: completedTopics.size,
+            process: process
         }
         } catch (error) {
             throw new Error (`Error getting Statistic : ${error.message}`);
         }
     },
-    getStatisticLesson
+    getStatisticLesson: async (lessonId, userId) => {
+        try {
+            const completedPractise= await Result.findAll({
+                where: {
+                    lessonId :lessonId,
+                    userId :userId
+                }
+            });
+            const completedPractiseCount = completedPractise.length;
+            if (completedPractiseCount === 0) {
+                const results = {
+                    count: completedPractiseCount,
+                    content: ""
+                }
+                return results;
+            }
+    
+            
+            
+            let maxContent = JSON.parse(completedPractise[0].content);
+    
+            for (const result of completedPractise) {
+                const jsonContent = JSON.parse(result.content);
+                if (maxContent.accuracyScore < jsonContent.accuracyScore) {
+                    maxContent = jsonContent;
+                } else if  (maxContent.accuracyScore ===  jsonContent.accuracyScore) {
+                    if (maxContent.pronunciationScore < jsonContent.pronunciationScore) {
+                        maxContent = jsonContent;
+                    } else if (maxContent.pronunciationScore === jsonContent.pronunciationScore) {
+                        if (maxContent.completenessScore < jsonContent.completenessScore) {
+                            maxContent = jsonContent;
+                        } else if (maxContent.completenessScore == jsonContent.completenessScore) {
+                            if (maxContent.fluencyScore < jsonContent.fluencyScore) {
+                                maxContent = jsonContent;
+                            }
+                        }
+                    }
+                
+                }
+            }
+    
+            return {
+                count : completedPractiseCount,
+                content: maxContent
+            }
+        } catch (error) {
+            throw new Error (`Error getting Statistic By Lesson and User: ${error.message}`)
+        }
+    
+    }
 }
