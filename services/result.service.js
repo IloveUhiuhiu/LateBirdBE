@@ -5,7 +5,7 @@ const {Result,Lesson} = require('../models');
 
 
 module.exports = {
-    getResultsByUserId: async (userId,data) => {
+    getResultsByUserId: async (userId) => {
         try {
             
             const results = await Result.findAll({
@@ -15,7 +15,7 @@ module.exports = {
             });
             return results;
         } catch (error) {
-            throw new Error(`Error fetching lessons by user ID ${data.userId}: ${error.message}`);
+            throw new Error(`Error fetching lessons by user ID ${userId}: ${error.message}`);
         }
     },
     createResult: async (data) => {

@@ -1,7 +1,6 @@
 const fs = require('fs');
-const { Lesson, Photo } = require('../models');
+const { Topic, Result, Lesson, Photo } = require('../models');
 const { STATUS_CODES } = require('http');
-
 module.exports = {
     getAllLesson: async () => {
         try {
@@ -24,7 +23,11 @@ module.exports = {
     },
     getAllLessonByTopicId: async (topicId) => { 
         try {
-            // Lấy tất cả các Lesson theo topicId
+            const topic = await Topic.findByPk(topicId);
+            if (!topic) {
+                throw new Error(`Topic not found`);
+            }
+            //đếm số lượng người học topic
             const lessons = await Lesson.findAll({
                 where: { topicId },
                 include: [{
@@ -36,11 +39,25 @@ module.exports = {
             if (!lessons) {
                 throw new Error(`Lessons not found`);
             }
-            // Trả về danh sách các Lesson
+            const results = await Result.findAll();
+            if (!results) {
+                throw new Error(`Results not found`);
+            }
+            const uniqueUserIds = new Set();
+            for(const lesson of lessons) {
+                results.forEach(result => {
+                    if (result.lessonId === lesson.lessonId) uniqueUserIds.add(result.userId);
+                });
+            };
+            
             
             return {
+
                 count: lessons.length,
+                nameTopic: topic.nameTopic,
+                countUser: uniqueUserIds.size,
                 lessons: lessons
+
             };
         } catch (error) {
             throw new Error(`Error fetching lessons by topic ID: ${error.message}`);
@@ -70,7 +87,7 @@ module.exports = {
         }
     },
         createLesson: async (req, res) => {
-            const { word, linkVideo, topicId } = req.body;
+            const { word, linkVideo1,linkVideo2, topicId } = req.body;
             const images = req.files;
 
             // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
@@ -83,7 +100,7 @@ module.exports = {
 
             try {
                 // Tạo bài học mới trong cơ sở dữ liệu
-                const lesson = await Lesson.create({ word, linkVideo, topicId });
+                const lesson = await Lesson.create({ word, linkVideo1, linkVideo2, topicId });
 
                 // Lưu các đường dẫn ảnh vào cơ sở dữ liệu
                 const photoPromises = imgPaths.map(imgPath => {
@@ -100,7 +117,7 @@ module.exports = {
     },
     //update lesson
     updateLesson: async (lessonId, newLesson, images) => {
-        const { word, linkVideo, topicId } = newLesson;
+        const { word, linkVideo1,linkVideo2, topicId } = newLesson;
 
         // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
         const imgPaths = [];
@@ -118,7 +135,8 @@ module.exports = {
             }
             // Cập nhật thông tin bài học
             lesson.word = word;
-            lesson.linkVideo = linkVideo;
+            lesson.linkVideo1 = linkVideo1;
+            lesson.linkVideo2 = linkVideo2;
             lesson.topicId = topicId;
             await lesson.save();
             // Lưu các đường dẫn ảnh vào cơ sở dữ liệu

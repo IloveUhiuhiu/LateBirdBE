@@ -26,7 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         word: {
             type: DataTypes.STRING(128)
         },
-        linkVideo: {
+        linkVideo1: {
+            type: DataTypes.STRING(128)
+        },
+        linkVideo2: {
             type: DataTypes.STRING(128)
         }
     }, {

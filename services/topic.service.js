@@ -1,7 +1,7 @@
 
 const { loadEnvFile } = require('process');
-const { Lesson,Topic } = require('../models');
-
+const { Result,Topic } = require('../models');
+const lessonService = require('../services/lesson.service');
 
 module.exports = {
     getAllTopic: async () => {
@@ -15,7 +15,9 @@ module.exports = {
     },
     getTopicById: async (topicId) => {
         try {
+            
             const topic = await Topic.findByPk(topicId);
+            
             return topic;
         } catch (error) {
             throw new Error(`Error fetching topic by id: ${error.message}`);

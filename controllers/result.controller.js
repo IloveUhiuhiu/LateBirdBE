@@ -1,11 +1,14 @@
 const resultService = require('../services/result.service');
-
+const jwtService = require("../services/jwt.service");
 module.exports = {
     getResultsByUserId: async (req,res) => {
         try {
-            let userId = req.params.userId;
+            
 
-            const results = await resultService.getResultsByUserId(userId, req.body); 
+            const results = await resultService.getResultsByUserId(
+                jwtService.decodeToken(req.headers.authorization.substring(7))
+                    .userId
+            ); 
             if (results.error) {
                 res.status(results.statusCode || 500).json({
                     error: results.message
@@ -85,7 +88,7 @@ module.exports = {
     },
     getStatisticLesson: async(req,res) => {
         try {
-            let userId = req.params.userId;
+            let userId = jwtService.decodeToken(req.headers.authorization.substring(7)).userId;
             let lessonId = req.params.lessonId;
             const result = await resultService.getStatisticLesson(lessonId,userId);
             if (result.error) {
@@ -104,8 +107,11 @@ module.exports = {
     },
     getStatistic: async (req,res) => {
         try {
-            let userId = req.params.userId;
-            const result = await resultService.getStatistic(userId);
+            
+            const result = await resultService.getStatistic(
+                jwtService.decodeToken(req.headers.authorization.substring(7))
+                    .userId
+            );
             if (result.error) {
                 res.status(res.statusCode || 500).json({
                     error: result.message
