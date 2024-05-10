@@ -114,8 +114,11 @@ module.exports = {
             // Trả về Lesson được tìm thấy
             const result = {
                 topicName: topic.nameTopic,
-                lesson: lesson,
-                
+                lessonId: lesson.lessonId,
+                word: lesson.word,
+                linkVideo1: lesson.linkVideo1,
+                linkVideo2: lesson.linkVideo2,
+                photos: lesson.photos
             }
             return result;
         } catch (error) {
