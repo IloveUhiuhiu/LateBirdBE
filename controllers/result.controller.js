@@ -26,7 +26,10 @@ module.exports = {
     createResult: async (req, res) => {
         try {
             const contentString = JSON.stringify(req.body.content);
+            let userId = jwtService.decodeToken(req.headers.authorization.substring(7))
+                    .userId;
             const result = await resultService.createResult({
+                userId: userId,
                 ...req.body,
                 content: contentString // Gán chuỗi JSON vào trường content
             });

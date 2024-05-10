@@ -104,14 +104,20 @@ module.exports = {
                     attributes: ['photoId', 'linkPhoto']
                 }]
             });
-
-
+            
+            const topic = await Topic.findByPk(lesson.topicId);
+            
             // Kiểm tra xem Lesson có tồn tại không
             if (!lesson) {
                 throw new Error(`Lesson with ID ${lessonId} not found`, STATUS_CODES.NOT_FOUND);
             }
             // Trả về Lesson được tìm thấy
-            return lesson;
+            const result = {
+                topicName: topic.nameTopic,
+                lesson: lesson,
+                
+            }
+            return result;
         } catch (error) {
             throw new Error(`Error fetching lesson by ID: ${error.message}`);
         }
