@@ -1,9 +1,12 @@
 const topicService = require('../services/topic.service');
 
 module.exports = {
-    getAllTopic: async (req,res) => {
+    getAllTopic: async (req, res) => {
+        const topicName = req.query.topicName;
+        const sortBy = req.query.sortBy;
         try {
-            const results = await topicService.getAllTopic(); 
+
+            const results = await topicService.getAllTopic(topicName, sortBy); 
             if (results.error) {
                 res.status(results.statusCode || 500).json({
                     error: results.message

@@ -10,7 +10,10 @@ module.exports = (sequelize,DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-        // define association here
+        Topic.hasMany(models.Lesson, {
+            foreignKey: 'topicId',
+            as: 'lessons' // Đặt tên cho mối quan hệ để sử dụng trong các truy vấn
+        });
       }
     }
     Topic.init({

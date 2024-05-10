@@ -1,23 +1,57 @@
 
 const { loadEnvFile } = require('process');
-const { Result,Topic } = require('../models');
+const { Result, Topic, Lesson } = require('../models');
 const lessonService = require('../services/lesson.service');
+const { Op } = require('sequelize');
 
 module.exports = {
-    getAllTopic: async () => {
+    getAllTopic: async (topicName = "", sortBy = "asc") => {
         try {
-            const topics = await Topic.findAll(); 
-            return topics;
+            // Lấy danh sách các topic và bài học kèm theo
+            const topics = await Topic.findAll({
+                where: {
+                    nameTopic: {
+                        [Op.like]: `%${topicName}%`
+                    }
+                },
+                include: [{
+                    model: Lesson,
+                    as: 'lessons',
+                }]
+            });
+
+            // Lập qua từng topic và thực hiện đếm số lượng userID duy nhất
+            const topicResults = await Promise.all(topics.map(async (topic) => {
+                const lessonIDs = topic.lessons.map(lesson => lesson.lessonId);
+                await Promise.all(lessonIDs);
+                const uniqueUserCount = await Result.count({
+                    distinct: true,
+                    col: 'userId',
+                    where: {
+                        lessonId: lessonIDs
+                    }
+                });
+                return {
+                    topicId: topic.topicId,
+                    topicName: topic.nameTopic,
+                    linkPhoto: topic.linkPhoto,
+                    lessons:topic.lessons,
+                    numberOfLessons: lessonIDs.length,
+                    numberOfLearnedUsers: uniqueUserCount
+                };
+            }));
+
+            return topicResults;
         } catch (error) {
             throw new Error(`Error fetching all topic: ${error.message}`);
         }
-        
     },
+
     getTopicById: async (topicId) => {
         try {
-            
+
             const topic = await Topic.findByPk(topicId);
-            
+
             return topic;
         } catch (error) {
             throw new Error(`Error fetching topic by id: ${error.message}`);
@@ -28,7 +62,7 @@ module.exports = {
             const existingTopic = await Topic.findOne({
                 where: {
                     nameTopic: data.nameTopic
-                    
+
                 }
             });
             if (existingTopic) {
@@ -49,14 +83,14 @@ module.exports = {
                     linkPhoto: topic.linkPhoto
                 },
             };
-            
+
             return result;
         } catch (error) {
             throw new Error(`Error creating topic: ${error.message}`);
-        }   
-        
+        }
+
     },
-    updateTopic: async (topicId,data) => {
+    updateTopic: async (topicId, data) => {
         try {
             const topic = await Topic.findByPk(topicId);
             if (!topic) {
