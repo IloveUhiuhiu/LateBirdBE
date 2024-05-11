@@ -19,7 +19,15 @@ module.exports = {
                     as: 'lessons',
                 }]
             });
-
+            if (!topics) {
+                throw new Error(`Topic not found`);
+            }
+            if (sortBy === "desc") {
+                topics.sort((a, b) => b.nameTopic.localeCompare(a.nameTopic));
+            }
+            else {
+                topics.sort((a, b) => a.nameTopic.localeCompare(b.nameTopic));
+            }
             // Lập qua từng topic và thực hiện đếm số lượng userID duy nhất
             const topicResults = await Promise.all(topics.map(async (topic) => {
                 const lessonIDs = topic.lessons.map(lesson => lesson.lessonId);
@@ -72,8 +80,27 @@ module.exports = {
         }
         else {
             topics.sort((a, b) => a.nameTopic.localeCompare(b.nameTopic));
-        }
-        return topics;
+            }
+        const topicResults = await Promise.all(topics.map(async (topic) => {
+            const lessonIDs = topic.lessons.map(lesson => lesson.lessonId);
+            await Promise.all(lessonIDs);
+            const uniqueUserCount = await Result.count({
+                distinct: true,
+                col: 'userId',
+                where: {
+                    lessonId: lessonIDs
+                }
+            });
+            return {
+                topicId: topic.topicId,
+                topicName: topic.nameTopic,
+                linkPhoto: topic.linkPhoto,
+                lessons: topic.lessons,
+                numberOfLessons: lessonIDs.length,
+                numberOfLearnedUsers: uniqueUserCount
+            };
+        }));
+            return topicResults;
     } catch(error) {
         throw new Error(`Error fetching topics: ${error.message}`);
     }
