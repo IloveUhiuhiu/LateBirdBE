@@ -1,5 +1,6 @@
+const { get } = require('../routes/lesson.route');
 const topicService = require('../services/topic.service');
-
+const jwtService = require("../services/jwt.service");
 module.exports = {
     getAllTopic: async (req, res) => {
         const topicName = req.query.topicName;
@@ -20,6 +21,26 @@ module.exports = {
             });
         }
         
+    },
+    getAllTopicByUserId: async (req, res) => { 
+        try {
+            const userID = jwtService.decodeToken(req.headers.authorization.substring(7))
+                .userId
+            const topicName = req.query.topicName;
+            const sortBy = req.query.sortBy;
+            const results = await topicService.getAllTopicByUserId(userID,topicName,sortBy);
+            if (results.error) {
+                res.status(results.statusCode || 500).json({
+                    error: results.message
+                });
+            } else {
+                res.status(200).json(results);
+            }
+        } catch (error) {
+            res.status(error.statusCode || 500).json({
+                error: error.message
+            });
+        }
     },
     getTopicById: async (req,res) => {
         try {

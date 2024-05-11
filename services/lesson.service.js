@@ -24,7 +24,7 @@ module.exports = {
                 }]
             });
             if (!lessons) {
-                throw new Error(`Lessons with topic ID ${topicId} not found`);
+                throw new Error(`Lessons not found`);
             }
             if (sortBy === "desc") {
                 lessons.sort((a, b) => b.word.localeCompare(a.word));

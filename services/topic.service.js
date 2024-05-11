@@ -46,6 +46,38 @@ module.exports = {
             throw new Error(`Error fetching all topic: ${error.message}`);
         }
     },
+    getAllTopicByUserId: async (userId, topicName = "", sortBy = "asc") => { 
+        try {
+        const allLesson = await lessonService.getAllLesson(userId);
+        const studiedLessons = allLesson.filter(lesson => lesson.studiedTimes > 0);
+        const topicIds = studiedLessons.map(lesson => lesson.topicId);
+        const uniqueTopicIds = [...new Set(topicIds)];
+        const topics = await Topic.findAll({
+            where: {
+                topicId: uniqueTopicIds,
+                nameTopic: {
+                    [Op.like]: `%${topicName}%`
+                }
+            },
+            include: [{
+                model: Lesson,
+                as: 'lessons',
+            }]
+        });
+        if (!topics) {
+            throw new Error(`Topic not found`);
+        }
+        if (sortBy === "desc") {
+            topics.sort((a, b) => b.nameTopic.localeCompare(a.nameTopic));
+        }
+        else {
+            topics.sort((a, b) => a.nameTopic.localeCompare(b.nameTopic));
+        }
+        return topics;
+    } catch(error) {
+        throw new Error(`Error fetching topics: ${error.message}`);
+    }
+    },
 
     getTopicById: async (topicId) => {
         try {
