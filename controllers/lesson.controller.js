@@ -1,4 +1,5 @@
 const lessonService = require('../services/lesson.service');
+const jwtService = require("../services/jwt.service");
 module.exports = {
     createLesson: async (req, res) => {
         try {
@@ -19,7 +20,11 @@ module.exports = {
     },
     getAllLessons: async (req, res) => {
         try {
-            const result = await lessonService.getAllLesson();
+            const userID=jwtService.decodeToken(req.headers.authorization.substring(7))
+                .userId
+            const lessonTitle = req.query.lessonTitle;
+            const sortBy = req.query.sortBy;
+            const result = await lessonService.getAllLesson(userID,lessonTitle, sortBy);
             res.status(200).json(result);
         } catch (error) {
             res.status(error.statusCode || 500).json({ error: error.message });

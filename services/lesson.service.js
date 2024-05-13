@@ -1,11 +1,22 @@
 const fs = require('fs');
+const { Op } = require('sequelize');
 const { Topic, Result, Lesson, Photo } = require('../models');
 const { STATUS_CODES } = require('http');
+const { where } = require('sequelize');
+const resultService = require('./result.service');
 module.exports = {
-    getAllLesson: async () => {
+    getAllLesson: async (userID,lessonTitle = "", sortBy = "asc") => {
         try {
             // Lấy tất cả các Lesson
+            if (!userID) {
+                throw new Error(`Unauthorized`);
+            }
             const lessons = await Lesson.findAll({
+                where: {
+                    word: {
+                        [Op.like]: `%${lessonTitle}%`
+                    }
+                },
                 include: [{
                     model: Photo,
                     as: 'photos',
@@ -13,15 +24,34 @@ module.exports = {
                 }]
             });
             if (!lessons) {
-                throw new Error(`Lessons with topic ID ${topicId} not found`);
+                throw new Error(`Lessons not found`);
             }
-            // Trả về danh sách các Lesson
-            return lessons;
+            if (sortBy === "desc") {
+                lessons.sort((a, b) => b.word.localeCompare(a.word));
+            }
+            else {
+                lessons.sort((a, b) => a.word.localeCompare(b.word));
+            }
+            const result = await Promise.all(lessons.map(async (lesson) => {
+                try {
+                    const count = await resultService.countUserByLesson(lesson.lessonId);
+                    const LearnedPeople = count.countUser;
+                    const topic = await Topic.findByPk(lesson.topicId);
+                    const topicName = topic?.nameTopic ?? "";
+                    const getStatisticLesson = await resultService.getStatisticLesson(lesson.lessonId, userID);
+                    const studiedTimes = getStatisticLesson.count;
+                    const maxScore = getStatisticLesson.content;
+                    return { ...lesson.toJSON(),topicName, LearnedPeople,studiedTimes,maxScore };
+                } catch (error) {
+                    throw new Error(`Error processing lesson: ${error.message}`);
+                }
+            }));
+            return result;
         } catch (error) {
             throw new Error(`Error fetching lessons: ${error.message}`);
         }
     },
-    getAllLessonByTopicId: async (topicId) => { 
+    getAllLessonByTopicId: async (topicId) => {
         try {
             const topic = await Topic.findByPk(topicId);
             if (!topic) {
@@ -44,13 +74,13 @@ module.exports = {
                 throw new Error(`Results not found`);
             }
             const uniqueUserIds = new Set();
-            for(const lesson of lessons) {
+            for (const lesson of lessons) {
                 results.forEach(result => {
                     if (result.lessonId === lesson.lessonId) uniqueUserIds.add(result.userId);
                 });
             };
-            
-            
+
+
             return {
 
                 count: lessons.length,
@@ -84,53 +114,56 @@ module.exports = {
             // Trả về Lesson được tìm thấy
             const result = {
                 topicName: topic.nameTopic,
-                lesson: lesson,
-                
+                lessonId: lesson.lessonId,
+                word: lesson.word,
+                linkVideo1: lesson.linkVideo1,
+                linkVideo2: lesson.linkVideo2,
+                photos: lesson.photos
             }
             return result;
         } catch (error) {
             throw new Error(`Error fetching lesson by ID: ${error.message}`);
         }
     },
-        createLesson: async (req, res) => {
-            const { word, linkVideo1,linkVideo2, topicId } = req.body;
-            const images = req.files;
-
-            // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
-            const imgPaths = [];
-            images.forEach((image, index) => {
-                const imgPath = `uploads/${image.originalname}`;
-                fs.renameSync(image.path, imgPath);
-                imgPaths.push("http://localhost:3007/"+imgPath);
-            });
-
-            try {
-                // Tạo bài học mới trong cơ sở dữ liệu
-                const lesson = await Lesson.create({ word, linkVideo1, linkVideo2, topicId });
-
-                // Lưu các đường dẫn ảnh vào cơ sở dữ liệu
-                const photoPromises = imgPaths.map(imgPath => {
-                    return Photo.create({ lessonId: lesson.lessonId, linkPhoto: imgPath });
-                });
-
-                await Promise.all(photoPromises);
-
-                res.status(200).json({ message: 'Lesson created successfully.' });
-            } catch (error) {
-                console.error('Error creating lesson:', error);
-                res.status(500).json({ error: 'Internal server error' });
-            }
-    },
-    //update lesson
-    updateLesson: async (lessonId, newLesson, images) => {
-        const { word, linkVideo1,linkVideo2, topicId } = newLesson;
+    createLesson: async (req, res) => {
+        const { word, linkVideo1, linkVideo2, topicId } = req.body;
+        const images = req.files;
 
         // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
         const imgPaths = [];
         images.forEach((image, index) => {
             const imgPath = `uploads/${image.originalname}`;
             fs.renameSync(image.path, imgPath);
-            imgPaths.push("http://localhost:3007/"+imgPath);
+            imgPaths.push("http://localhost:3007/" + imgPath);
+        });
+
+        try {
+            // Tạo bài học mới trong cơ sở dữ liệu
+            const lesson = await Lesson.create({ word, linkVideo1, linkVideo2, topicId });
+
+            // Lưu các đường dẫn ảnh vào cơ sở dữ liệu
+            const photoPromises = imgPaths.map(imgPath => {
+                return Photo.create({ lessonId: lesson.lessonId, linkPhoto: imgPath });
+            });
+
+            await Promise.all(photoPromises);
+
+            res.status(200).json({ message: 'Lesson created successfully.' });
+        } catch (error) {
+            console.error('Error creating lesson:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    //update lesson
+    updateLesson: async (lessonId, newLesson, images) => {
+        const { word, linkVideo1, linkVideo2, topicId } = newLesson;
+
+        // Tiến hành lưu các tệp ảnh vào thư mục img trên máy chủ
+        const imgPaths = [];
+        images.forEach((image, index) => {
+            const imgPath = `uploads/${image.originalname}`;
+            fs.renameSync(image.path, imgPath);
+            imgPaths.push("http://localhost:3007/" + imgPath);
         });
 
         try {

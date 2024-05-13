@@ -173,52 +173,46 @@ module.exports = {
     },
     getStatisticLesson: async (lessonId, userId) => {
         try {
-            const completedPractise= await Result.findAll({
+            const completedPractises = await Result.findAll({
                 where: {
-                    lessonId :lessonId,
-                    userId :userId
+                    lessonId: lessonId,
+                    userId: userId
                 }
             });
-            const completedPractiseCount = completedPractise.length;
+
+            const completedPractiseCount = completedPractises.length;
+
             if (completedPractiseCount === 0) {
-                const results = {
+                return {
                     count: completedPractiseCount,
                     content: ""
-                }
-                return results;
+                };
             }
-    
-            
-            
-            let maxContent = JSON.parse(completedPractise[0].content);
-    
-            for (const result of completedPractise) {
-                const jsonContent = JSON.parse(result.content);
-                if (maxContent.accuracyScore < jsonContent.accuracyScore) {
-                    maxContent = jsonContent;
-                } else if  (maxContent.accuracyScore ===  jsonContent.accuracyScore) {
-                    if (maxContent.pronunciationScore < jsonContent.pronunciationScore) {
+
+            let maxContent = null;
+
+            for (const result of completedPractises) {
+                try {
+                    const jsonContent = JSON.parse(result.content);
+
+                    if (!maxContent || jsonContent.accuracyScore > maxContent.accuracyScore ||
+                        (jsonContent.accuracyScore === maxContent.accuracyScore && jsonContent.pronunciationScore > maxContent.pronunciationScore) ||
+                        (jsonContent.accuracyScore === maxContent.accuracyScore && jsonContent.pronunciationScore === maxContent.pronunciationScore && jsonContent.completenessScore > maxContent.completenessScore) ||
+                        (jsonContent.accuracyScore === maxContent.accuracyScore && jsonContent.pronunciationScore === maxContent.pronunciationScore && jsonContent.completenessScore === maxContent.completenessScore && jsonContent.fluencyScore > maxContent.fluencyScore)) {
                         maxContent = jsonContent;
-                    } else if (maxContent.pronunciationScore === jsonContent.pronunciationScore) {
-                        if (maxContent.completenessScore < jsonContent.completenessScore) {
-                            maxContent = jsonContent;
-                        } else if (maxContent.completenessScore == jsonContent.completenessScore) {
-                            if (maxContent.fluencyScore < jsonContent.fluencyScore) {
-                                maxContent = jsonContent;
-                            }
-                        }
                     }
-                
+                } catch (error) {
+                    console.error(`Error parsing JSON from result with id ${result.resultId}: ${error.message}`);
                 }
             }
-    
+
             return {
-                count : completedPractiseCount,
-                content: maxContent
-            }
+                count: completedPractiseCount,
+                content: maxContent || ""
+            };
         } catch (error) {
-            throw new Error (`Error getting Statistic By Lesson and User: ${error.message}`)
+            throw new Error(`Error getting Statistic By Lesson and User: ${error.message}`);
         }
-    
     }
+
 }
