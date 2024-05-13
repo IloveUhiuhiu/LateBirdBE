@@ -24,7 +24,7 @@ module.exports = (sequelize,DataTypes) => {
             primaryKey: true
         }, 
         linkPhoto:  {
-            type: DataTypes.STRING(128)
+            type: DataTypes.STRING(255)
         }
     }, {
         sequelize,

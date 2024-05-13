@@ -27,10 +27,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(128)
         },
         linkVideo1: {
-            type: DataTypes.STRING(128)
+            type: DataTypes.STRING(255)
         },
         linkVideo2: {
-            type: DataTypes.STRING(128)
+            type: DataTypes.STRING(255)
         }
     }, {
         sequelize,
